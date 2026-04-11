@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fatture per Forfettari — Fattura in 60 secondi.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+:root{
+  --forest:#1B4332;--forest-mid:#2D6A4F;--forest-light:#52B788;
+  --forest-pale:#D4EDDF;--forest-ghost:#F0FAF4;
+  --gold:#C9A84C;--gold-light:#E8D5A0;--gold-pale:#FBF4E3;
+  --ink:#111210;--muted:#656860;
+  --paper:#F8F6F2;--paper2:#EFECE5;--paper3:#E8E3D9;
+  --border:rgba(17,18,16,.08);
+  --serif:'Fraunces',Georgia,'Times New Roman',serif;
+  --sans:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --max-w:960px;
+}
+body{background:var(--paper);font-family:var(--sans);color:var(--ink);overflow-x:hidden;-webkit-font-smoothing:antialiased;font-size:15px;line-height:1.6;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:9990;opacity:.022;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-repeat:repeat;}
+a{text-decoration:none;color:inherit;}
+.cdot{position:fixed;width:6px;height:6px;background:var(--gold);border-radius:50%;pointer-events:none;z-index:10000;transform:translate(-50%,-50%);mix-blend-mode:multiply;}
+
+/* ── NAVBAR ──
+   #1: entrata smooth (opacity + translateY)
+   #2: padding-top = metà dell'altezza del padding hero (hero ha padding:14px, quindi nav-top = 14px + metà gap visivo) */
+#nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  padding:14px 14px 0; /* #2: stesso padding laterale dell'hero */
+  opacity:0;
+  animation:navSmooth 1s cubic-bezier(.22,1,.36,1) 1.8s forwards;
+}
+@keyframes navSmooth{
+  from{opacity:0;transform:translateY(-20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.nav-pill{
+  max-width:var(--max-w);margin:0 auto;
+  background:rgba(250,249,246,.93);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border:1px solid var(--border);border-radius:100px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 10px 10px 24px;
+  box-shadow:0 4px 40px rgba(0,0,0,.09);
+}
+.nav-logo{display:flex;align-items:center;gap:10px;font-family:var(--sans);font-weight:600;font-size:14px;color:var(--ink);letter-spacing:-.01em;}
+.nav-logo-icon{width:28px;height:28px;flex-shrink:0;}
+.nav-links{display:flex;align-items:center;gap:2px;}
+.nav-links a{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--muted);padding:7px 14px;border-radius:100px;transition:background .15s,color .15s;letter-spacing:-.005em;}
+.nav-links a:hover{background:rgba(0,0,0,.05);color:var(--ink);}
+.nav-cta{font-family:var(--sans);background:var(--forest);color:white;font-size:13px;font-weight:600;padding:9px 20px;border-radius:100px;transition:background .15s;letter-spacing:-.01em;}
+.nav-cta:hover{background:var(--forest-mid);}
+
+/* ── HERO ── #11: centrato, senza mock a destra */
+#hero{padding:14px;min-height:100vh;position:relative;}
+.hero-card{
+  position:relative;min-height:calc(100vh - 28px);background:#0f2d1e;
+  border-radius:24px;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  clip-path:inset(48% round 24px);
+  animation:openHero 2.2s var(--ease) .05s forwards;
+}
+@keyframes openHero{to{clip-path:inset(0% round 24px);}}
+
+/* #9: hero parallax — lo sfondo si muove con lo scroll */
+.hero-inner-bg{
+  position:absolute;inset:-80px;
+  background:#0f2d1e;
+  will-change:transform;
+}
+#hero-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:0;animation:fadeC 1.2s ease 1.8s forwards;}
+@keyframes fadeC{to{opacity:1;}}
+
+.hero-content{
+  position:relative;z-index:2;
+  text-align:center;
+  padding:60px 40px;
+  max-width:700px;
+  display:flex;flex-direction:column;align-items:center;
+}
+.hero-h1{font-family:var(--serif);font-size:clamp(48px,6.5vw,92px);line-height:1.03;letter-spacing:-.028em;color:white;margin-bottom:24px;opacity:0;animation:fadeUp .85s var(--ease) 1.2s forwards;font-weight:900;}
+.hero-h1 em{color:var(--gold-light);font-style:italic;font-weight:400;}
+.hero-sub{font-family:var(--sans);font-size:clamp(16px,1.8vw,20px);color:rgba(255,255,255,.58);line-height:1.65;margin-bottom:44px;max-width:500px;opacity:0;animation:fadeUp .85s var(--ease) 1.35s forwards;}
+.hero-actions{opacity:0;animation:fadeUp .85s var(--ease) 1.5s forwards;}
+.btn-white{display:inline-flex;align-items:center;font-family:var(--sans);font-size:16px;font-weight:600;background:white;color:var(--forest);padding:16px 36px;border-radius:100px;box-shadow:0 4px 20px rgba(0,0,0,.15);transition:transform .2s var(--ease),box-shadow .2s;letter-spacing:-.01em;}
+.btn-white:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.2);}
+
+/* ── SECTIONS ── */
+.sec{padding:0 14px;}
+.fu{opacity:0;transform:translateY(28px);transition:opacity .8s var(--ease),transform .8s var(--ease);}
+.fu.in{opacity:1;transform:translateY(0);}
+.fu.d1{transition-delay:.08s;}.fu.d2{transition-delay:.16s;}.fu.d3{transition-delay:.24s;}.fu.d4{transition-delay:.32s;}
+.card{border-radius:24px;overflow:hidden;margin-bottom:10px;}
+.inner{max-width:var(--max-w);margin:0 auto;}
+.eyebrow{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px;color:var(--forest);}
+.stitle{font-family:var(--serif);font-size:clamp(28px,3.2vw,46px);line-height:1.08;letter-spacing:-.022em;color:var(--ink);margin-bottom:14px;font-weight:900;}
+.stitle em{font-style:italic;font-weight:400;}
+.sbody{font-family:var(--sans);font-size:16px;line-height:1.7;color:var(--muted);}
+.r2{display:grid;gap:10px;}
+
+/* ── #10: PERCHÉ FpF (nuova sezione dopo hero) ── */
+.why-section{padding:80px 64px;}
+.why-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:52px;}
+.why-card{
+  background:white;border-radius:20px;padding:28px 24px;
+  border:1.5px solid var(--border);
+  transition:transform .3s var(--ease),border-color .2s;
+}
+.why-card:hover{transform:translateY(-4px);border-color:rgba(27,67,50,.2);}
+.why-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:16px;}
+.why-icon.green{background:rgba(82,183,136,.12);}
+.why-icon.gold{background:rgba(201,168,76,.1);}
+.why-icon.blue{background:rgba(59,130,246,.08);}
+.why-icon.ink{background:rgba(17,18,16,.05);}
+.why-card h3{font-family:var(--serif);font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px;line-height:1.2;letter-spacing:-.01em;}
+.why-card p{font-family:var(--sans);font-size:14px;line-height:1.65;color:var(--muted);}
+
+/* ── COME FUNZIONA ── */
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.step{background:white;border-radius:20px;padding:32px;}
+.step-num{font-family:var(--serif);font-weight:900;font-style:italic;font-size:52px;color:rgba(0,0,0,.045);line-height:1;margin-bottom:20px;}
+.step h3{font-family:var(--serif);font-weight:700;font-size:21px;color:var(--ink);margin-bottom:8px;letter-spacing:-.01em;}
+.step p{font-family:var(--sans);font-size:14px;line-height:1.65;color:var(--muted);}
+
+/* ── #12: DASHBOARD SECTION ── */
+.dash-section{padding:80px 64px;background:#0f2d1e;border-radius:24px;margin-bottom:10px;overflow:hidden;position:relative;}
+.dash-section::before{content:'';position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(82,183,136,.12) 0%,transparent 70%);top:-200px;right:-100px;pointer-events:none;}
+.dash-label{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.32);margin-bottom:16px;}
+.dash-title{font-family:var(--serif);font-size:clamp(28px,3vw,42px);font-weight:900;line-height:1.06;letter-spacing:-.022em;color:white;margin-bottom:40px;max-width:500px;}
+/* Dashboard UI mock */
+.dash-ui{
+  background:#FAF9F6;border-radius:20px;
+  box-shadow:0 40px 80px rgba(0,0,0,.4);
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.06);
+}
+.dash-topbar{
+  background:white;border-bottom:1px solid rgba(0,0,0,.06);
+  padding:14px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.dash-logo-row{display:flex;align-items:center;gap:8px;font-family:var(--sans);font-weight:600;font-size:13px;color:var(--ink);letter-spacing:-.01em;}
+.dash-logo-sm{width:22px;height:22px;background:var(--forest);border-radius:6px;display:flex;align-items:center;justify-content:center;}
+.dash-topbar-right{display:flex;align-items:center;gap:12px;}
+.dash-badge{background:var(--forest);color:white;font-size:10px;font-weight:700;padding:4px 12px;border-radius:100px;}
+.dash-year{font-size:12px;font-weight:600;color:var(--muted);border:1px solid var(--border);padding:4px 12px;border-radius:100px;}
+.dash-body{display:grid;grid-template-columns:220px 1fr;min-height:440px;}
+.dash-sidebar{background:#F5F4F1;border-right:1px solid var(--border);padding:20px 16px;}
+.dash-sidebar-title{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;padding-left:4px;}
+.dash-nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;font-size:13px;font-weight:500;color:var(--muted);margin-bottom:2px;cursor:pointer;}
+.dash-nav-item.active{background:white;color:var(--ink);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.dash-nav-icon{width:18px;height:18px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
+.dash-main{padding:24px;}
+/* Hero stat 85k */
+.dash-hero-stat{
+  background:var(--forest);border-radius:16px;padding:20px 24px;
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;
+}
+.dash-hero-left{}
+.dash-hero-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:6px;}
+.dash-hero-val{font-family:var(--serif);font-size:36px;font-weight:900;color:white;letter-spacing:-.025em;line-height:1;}
+.dash-hero-sub{font-size:12px;color:rgba(255,255,255,.45);margin-top:6px;}
+.dash-hero-bar{background:rgba(255,255,255,.15);border-radius:100px;height:6px;width:200px;overflow:hidden;margin-top:8px;}
+.dash-hero-fill{height:100%;background:var(--gold);border-radius:100px;width:61.6%;}
+/* Quick stats */
+.dash-stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.dash-stat{background:white;border-radius:12px;padding:14px 16px;border:1px solid var(--border);}
+.dash-stat-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px;}
+.dash-stat-val{font-family:var(--serif);font-size:20px;font-weight:700;color:var(--ink);letter-spacing:-.01em;}
+.dash-stat-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+/* Fatture recenti */
+.dash-section-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
+.dash-invoice-row{display:flex;align-items:center;gap:12px;padding:10px 14px;background:white;border-radius:10px;border:1px solid var(--border);margin-bottom:6px;}
+.dash-inv-avatar{width:32px;height:32px;border-radius:8px;background:var(--forest);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.dash-inv-info{flex:1;}
+.dash-inv-name{font-size:13px;font-weight:600;color:var(--ink);}
+.dash-inv-date{font-size:11px;color:var(--muted);}
+.dash-inv-amt{font-family:var(--serif);font-size:14px;font-weight:700;color:var(--ink);}
+.dash-inv-badge{font-size:10px;font-weight:600;padding:3px 8px;border-radius:100px;}
+.dash-inv-badge.sent{background:rgba(82,183,136,.15);color:var(--forest);}
+.dash-inv-badge.cash{background:rgba(201,168,76,.15);color:#7a5a10;}
+
+/* ── #5: iPhone mockup CSS ── */
+.iphone-wrap{display:flex;justify-content:center;align-items:flex-end;padding:40px 0 0;}
+.iphone{
+  width:240px;
+  background:linear-gradient(145deg,#2a2a2a,#1a1a1a);
+  border-radius:44px;
+  padding:10px;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,.08),
+    0 40px 80px rgba(0,0,0,.5),
+    inset 0 1px 0 rgba(255,255,255,.15);
+  position:relative;
+  transform:rotate(-2deg);
+}
+.iphone-notch{
+  position:absolute;top:14px;left:50%;transform:translateX(-50%);
+  width:80px;height:26px;background:#1a1a1a;border-radius:13px;z-index:10;
+}
+.iphone-screen{
+  background:#FAF9F6;border-radius:34px;overflow:hidden;
+  padding:36px 0 0;
+  min-height:480px;
+  position:relative;
+}
+/* Status bar */
+.iphone-statusbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px 10px;font-size:10px;font-weight:600;color:var(--ink);
+}
+/* Mobile dashboard */
+.mob-topbar{background:var(--forest);padding:16px 16px 20px;color:white;}
+.mob-greeting{font-family:var(--sans);font-size:11px;color:rgba(255,255,255,.6);margin-bottom:2px;}
+.mob-name{font-family:var(--serif);font-size:18px;font-weight:700;color:white;letter-spacing:-.015em;}
+/* 85k card */
+.mob-85k{background:rgba(255,255,255,.12);border-radius:14px;padding:14px;margin:12px 16px;border:1px solid rgba(255,255,255,.15);}
+.mob-85k-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.55);margin-bottom:4px;}
+.mob-85k-val{font-family:var(--serif);font-size:26px;font-weight:900;color:white;letter-spacing:-.02em;}
+.mob-85k-track{height:5px;background:rgba(255,255,255,.2);border-radius:100px;margin-top:8px;overflow:hidden;}
+.mob-85k-fill{height:100%;width:61%;background:var(--gold);border-radius:100px;}
+/* Bottom white area */
+.mob-content{background:var(--paper);border-radius:20px 20px 0 0;margin-top:-6px;padding:16px;min-height:260px;}
+.mob-section-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px;}
+.mob-inv-row{display:flex;align-items:center;gap:10px;padding:9px 12px;background:white;border-radius:10px;margin-bottom:6px;border:1px solid var(--border);}
+.mob-inv-av{width:28px;height:28px;border-radius:7px;background:var(--forest);color:white;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;}
+.mob-inv-info{flex:1;}
+.mob-inv-name{font-size:11px;font-weight:600;color:var(--ink);}
+.mob-inv-date{font-size:9px;color:var(--muted);}
+.mob-inv-amt{font-family:var(--serif);font-size:12px;font-weight:700;color:var(--ink);}
+/* Quick actions */
+.mob-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+.mob-action{background:white;border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center;}
+.mob-action-icon{font-size:16px;display:block;margin-bottom:4px;}
+.mob-action-label{font-size:9px;font-weight:600;color:var(--muted);}
+/* Floating badge */
+.iphone-float{
+  position:absolute;right:-40px;top:80px;
+  background:white;border-radius:12px;padding:10px 14px;
+  box-shadow:0 8px 32px rgba(0,0,0,.15);
+  font-size:11px;font-weight:600;color:var(--ink);
+  white-space:nowrap;
+  display:flex;align-items:center;gap:6px;
+  animation:floatBob 3s ease-in-out infinite;
+}
+@keyframes floatBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.iphone-float2{
+  position:absolute;left:-50px;bottom:120px;
+  background:var(--forest);border-radius:12px;padding:10px 14px;
+  box-shadow:0 8px 32px rgba(0,0,0,.2);
+  font-size:11px;font-weight:600;color:white;
+  white-space:nowrap;
+  animation:floatBob 3s ease-in-out .8s infinite;
+}
+
+/* ── #5/#6: APP SECTION ── */
+.app-section{
+  position:relative;overflow:hidden;
+  display:grid;grid-template-columns:1fr 1fr;
+  align-items:center;gap:0;min-height:560px;
+}
+.app-bg{position:absolute;inset:0;background:linear-gradient(135deg,#F6E7CF 0%,#FDDBCE 100%);}
+.app-left{position:relative;z-index:2;padding:80px 60px;}
+/* #6: solo titolo grande, niente sottotesto */
+.app-big-title{font-family:var(--serif);font-size:clamp(36px,5vw,66px);font-weight:900;line-height:1.04;letter-spacing:-.026em;color:var(--ink);}
+.app-big-title em{font-style:italic;font-weight:400;color:#7C4A1E;}
+.app-store-btns{display:flex;gap:12px;flex-wrap:wrap;margin-top:36px;}
+.app-right{position:relative;z-index:2;display:flex;justify-content:center;align-items:flex-end;padding-top:40px;}
+
+/* ── SCADENZE: layout più compatto, meno spazio vuoto #13 ── */
+.scad-compact{padding:40px 48px;min-height:auto;}
+.scad-inner{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start;}
+.scad-list{background:white;border-radius:16px;padding:20px;}
+.scad-list-title{font-family:var(--serif);font-weight:700;font-size:14px;color:var(--ink);margin-bottom:14px;}
+.scad-item{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid rgba(0,0,0,.05);}
+.scad-item:last-child{border-bottom:none;}
+.scad-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.scad-info{flex:1;}
+.scad-name{font-size:13px;font-weight:600;color:var(--ink);}
+.scad-sub{font-size:11px;color:var(--muted);margin-top:1px;}
+.scad-amt{font-family:var(--serif);font-weight:700;font-size:13px;color:var(--ink);}
+
+/* ── MONITOR 85k ── */
+#monitor-widget{background:white;border-radius:16px;padding:20px;}
+#mon-num{font-family:var(--serif);font-weight:900;font-size:36px;line-height:1;letter-spacing:-.03em;color:var(--ink);margin-bottom:4px;}
+.mon-track{height:10px;background:rgba(0,0,0,.05);border-radius:100px;overflow:hidden;margin-bottom:8px;}
+#mon-bar{height:100%;width:47%;background:linear-gradient(90deg,var(--forest),var(--forest-light));border-radius:100px;transition:width .04s linear;}
+.mon-meta{display:flex;justify-content:space-between;}
+.months{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;margin-top:12px;}
+.month-bar{height:24px;background:rgba(0,0,0,.05);border-radius:3px;position:relative;overflow:hidden;}
+.month-fill{position:absolute;bottom:0;left:0;right:0;background:rgba(82,183,136,.35);border-radius:3px;}
+.month-fill.active{background:var(--forest-light);}
+
+/* ── TICKER ── */
+.ticker-wrap{overflow:hidden;}
+.ticker-row{display:flex;gap:10px;white-space:nowrap;animation:tickFwd 28s linear infinite;width:max-content;}
+.ticker-row.rev{animation-name:tickRev;animation-duration:34s;}
+@keyframes tickFwd{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes tickRev{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+
+/* ── PRICING ── */
+.pf{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px;color:rgba(255,255,255,.7);line-height:1.3;white-space:nowrap;}
+.pf:last-child{border-bottom:none;}
+.pc{width:18px;height:18px;background:rgba(82,183,136,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* ── TESTIMONIALS ── */
+.testi{background:var(--paper);border-radius:20px;padding:28px;display:flex;flex-direction:column;justify-content:space-between;min-height:180px;border:1.5px solid var(--border);}
+.testi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+
+/* ── FAQ: #8 più larghe, full container ── */
+.faq-section{padding:80px 64px;}
+.faq-header{text-align:center;margin-bottom:52px;}
+.faq-eyebrow{font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:16px;}
+.faq-title{font-family:var(--serif);font-size:clamp(32px,4vw,58px);font-weight:900;line-height:1.06;letter-spacing:-.024em;color:var(--ink);}
+/* #8: no max-width, full larghezza del container */
+.faq-list{display:flex;flex-direction:column;gap:10px;}
+.faq-item{background:white;border-radius:20px;overflow:hidden;border:1.5px solid var(--border);transition:border-color .2s;}
+.faq-item.open{border-color:rgba(27,67,50,.2);}
+.faq-q{width:100%;display:flex;align-items:center;justify-content:space-between;padding:22px 28px;cursor:pointer;font-family:var(--sans);font-size:16px;font-weight:600;color:var(--ink);text-align:left;background:none;border:none;gap:20px;letter-spacing:-.01em;}
+.faq-q:hover{background:rgba(0,0,0,.01);}
+.faq-icon{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s,border-color .2s;}
+.faq-item.open .faq-icon{background:var(--forest);border-color:var(--forest);}
+.faq-plus{font-size:18px;font-weight:300;color:var(--ink);transition:transform .3s,color .2s;line-height:1;}
+.faq-item.open .faq-plus{transform:rotate(45deg);color:white;}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s var(--ease),padding .3s;padding:0 28px;}
+.faq-item.open .faq-a{max-height:300px;padding:0 28px 24px;}
+.faq-a p{font-size:15px;line-height:1.7;color:var(--muted);}
+
+/* FOOTER */
+.fl{display:block;font-family:var(--sans);font-size:14px;font-weight:500;color:rgba(255,255,255,.38);padding:5px 0;transition:color .15s;letter-spacing:-.005em;}
+.fl:hover{color:rgba(255,255,255,.82);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
+
+/* RESPONSIVE */
+@media(max-width:1024px){
+  .why-grid{grid-template-columns:repeat(2,1fr);}
+  .dash-body{grid-template-columns:180px 1fr;}
+  .app-section{grid-template-columns:1fr;}
+  .app-right{display:none;}
+}
+@media(max-width:900px){
+  .hero-card{align-items:flex-end;padding-bottom:60px;}
+  .r2{grid-template-columns:1fr!important;}.how-grid{grid-template-columns:1fr;}.nav-links{display:none;}
+  .testi-grid{grid-template-columns:1fr 1fr;}.scad-inner{grid-template-columns:1fr;}
+  .dash-body{grid-template-columns:1fr;}.dash-sidebar{display:none;}
+  .why-section,.dash-section,.faq-section{padding:56px 28px;}
+}
+@media(max-width:600px){
+  #hero{padding:10px;}.sec{padding:0 10px;}.card{margin-bottom:8px;}
+  .testi-grid{grid-template-columns:1fr;}.pf{white-space:normal;}
+  .why-grid{grid-template-columns:1fr;}.faq-section{padding:48px 16px;}
+}
+</style>
+</head>
+<body>
+
+<div class="cdot" id="dot"></div>
+
+<!-- NAVBAR -->
+<nav id="nav">
+  <div class="nav-pill">
+    <a href="#" class="nav-logo">
+      <!-- Mark v8B: blocco verde + F negative space, braccio sup esteso -->
+      <svg class="nav-logo-icon" width="28" height="28" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="48" height="48" rx="7" fill="#1B4332"/>
+        <rect x="10" y="10" width="7"  height="28" fill="#F8F6F2"/>
+        <rect x="10" y="10" width="32" height="6"  fill="#F8F6F2"/>
+        <rect x="10" y="22" width="18" height="5"  fill="#F8F6F2"/>
+      </svg>
+      Fatture per Forfettari
+    </a>
+    <div class="nav-links">
+      <a href="#perche">Perché FpF</a>
+      <a href="#come-funziona">Come funziona</a>
+      <a href="#prezzi">Prezzi</a>
+    </div>
+    <a href="#inizia" class="nav-cta">Accesso anticipato</a>
+  </div>
+</nav>
+
+<!-- ── HERO: centrato, senza mock ── -->
+<section id="hero">
+  <div class="hero-card" id="hero-card">
+    <div class="hero-inner-bg" id="hero-bg"></div>
+    <canvas id="hero-canvas"></canvas>
+    <div style="position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(82,183,136,.2) 0%,transparent 70%);top:-150px;left:-100px;z-index:1;pointer-events:none;"></div>
+    <div style="position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,.1) 0%,transparent 70%);bottom:-100px;right:-80px;z-index:1;pointer-events:none;"></div>
+    <div class="hero-content">
+      <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:100px;padding:7px 16px;margin-bottom:28px;opacity:0;animation:fadeUp .7s var(--ease) 1.0s forwards;">
+        <span style="width:7px;height:7px;border-radius:50%;background:var(--gold);display:inline-block;flex-shrink:0;animation:pulse 2s ease-in-out infinite;"></span>
+        <span style="font-family:var(--sans);font-size:12px;font-weight:600;color:rgba(255,255,255,.8);letter-spacing:.02em;">Accesso anticipato · Primi posti disponibili</span>
+      </div>
+      <h1 class="hero-h1">Il gestionale<br><em>dei forfettari.</em></h1>
+      <p class="hero-sub">Costruito solo per il regime forfettario. Nient'altro.</p>
+      <div class="hero-actions">
+        <a href="#inizia" class="btn-white">Richiedi accesso anticipato</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="sec">
+
+<!-- ── #10: PERCHÉ FpF ── -->
+<section id="perche" class="card fu why-section" style="background:var(--paper2);">
+  <div class="inner">
+    <div class="eyebrow">Perché sceglierci</div>
+    <h2 class="stitle" style="font-size:clamp(28px,3.5vw,46px);">Non siamo generalisti.<br><em>Solo un cliente: i forfettari.</em></h2>
+  </div>
+  <div class="inner why-grid">
+    <div class="why-card fu d1">
+      <div class="why-icon green">
+        <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
+          <path d="M12 2L4 13h7l-1 7 10-11h-7l1-7z" fill="#1B4332" opacity=".85" stroke="#1B4332" stroke-width=".3" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h3>Apri. Compila. Invia.</h3>
+      <p>Nessun corso, nessun manuale. In cinque minuti fai la prima fattura corretta e la invii al SdI. Davvero.</p>
+    </div>
+    <div class="why-card fu d2">
+      <div class="why-icon gold">
+        <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
+          <circle cx="11" cy="11" r="9" stroke="#C9A84C" stroke-width="1.5"/>
+          <circle cx="11" cy="11" r="5" stroke="#C9A84C" stroke-width="1.5"/>
+          <circle cx="11" cy="11" r="2" fill="#C9A84C"/>
+        </svg>
+      </div>
+      <h3>Non puoi sbagliare</h3>
+      <p>RF19, N2.2, bollo automatico, limite 85k, scadenze INPS. Tutto già configurato per il tuo regime. Zero margine di errore.</p>
+    </div>
+    <div class="why-card fu d3">
+      <div class="why-icon blue">
+        <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
+          <circle cx="11" cy="11" r="3" stroke="#3B82F6" stroke-width="1.5"/>
+          <path d="M11 4v2M11 16v2M4 11H2M20 11h-2M6.22 6.22l1.42 1.42M14.36 14.36l1.42 1.42M6.22 15.78l1.42-1.42M14.36 7.64l1.42-1.42" stroke="#3B82F6" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3>Il resto è automatico</h3>
+      <p>Bollo, lookup P.IVA, scadenze fiscali, calcolo INPS: succede da solo. Tu pensi al lavoro, non alla burocrazia.</p>
+    </div>
+    <div class="why-card fu d4" style="background:var(--forest);border-color:var(--forest);">
+      <div class="why-icon" style="background:rgba(255,255,255,.12);">
+        <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
+          <circle cx="11" cy="11" r="9" stroke="rgba(255,255,255,.7)" stroke-width="1.5"/>
+          <path d="M7.5 11h7M11 7.5v7" stroke="rgba(255,255,255,.7)" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M14.5 7.5L7.5 14.5" stroke="rgba(255,255,255,.5)" stroke-width="1.2" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3 style="color:white;">IVA? No grazie.</h3>
+      <p style="color:rgba(255,255,255,.65);">Sei in regime forfettario: non applichi IVA, usi N2.2. Lo sappiamo già. Non devi spiegare niente a nessuno.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── COME FUNZIONA ── -->
+<section id="come-funziona" class="card fu" style="background:var(--paper2);padding:72px 64px;">
+  <div class="inner">
+    <div class="eyebrow">Come funziona</div>
+    <h2 class="stitle">Tre passi. Poi la fattura <em>parte da sola.</em></h2>
+    <p class="sbody" style="margin-bottom:48px;">Nessun corso. Nessun manuale. Apri l'app e fai la tua prima fattura oggi stesso.</p>
+    <div class="how-grid">
+      <div class="step fu d1">
+        <div class="step-num">01</div>
+        <div style="margin-bottom:14px;">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <circle cx="14" cy="10" r="5" stroke="#1B4332" stroke-width="1.8"/>
+            <path d="M4 24c0-5.52 4.48-10 10-10s10 4.48 10 10" stroke="#1B4332" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>Scrivi la P.IVA del cliente</h3>
+        <p>Nome, indirizzo e codice destinatario SdI arrivano in automatico. Non scrivi niente a mano.</p>
+      </div>
+      <div class="step fu d2">
+        <div class="step-num">02</div>
+        <div style="margin-bottom:14px;">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <path d="M4 22l3-1 13-13-2-2L5 19 4 22z" stroke="#1B4332" stroke-width="1.8" stroke-linejoin="round"/>
+            <path d="M18 6l2 2" stroke="#1B4332" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3>Descrivi la prestazione</h3>
+        <p>Testo libero e importo. Il bollo da 2€ si aggiunge da solo sopra 77,47€. RF19 e N2.2 già impostati.</p>
+      </div>
+      <div class="step fu d3">
+        <div class="step-num">03</div>
+        <div style="margin-bottom:14px;">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <path d="M4 14h16M14 8l6 6-6 6" stroke="#1B4332" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="22" y1="6" x2="22" y2="22" stroke="#1B4332" stroke-width="1.8" stroke-linecap="round" opacity=".3"/>
+          </svg>
+        </div>
+        <h3>Invia. Fatto.</h3>
+        <p>Un click e la fattura XML parte verso il SdI. Arriva al cliente, viene conservata per 10 anni. Fine.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── #12: DASHBOARD SECTION ── -->
+<div class="dash-section fu">
+  <div class="inner">
+    <div class="dash-label">Il prodotto</div>
+    <div class="dash-title">Tutto sotto controllo,<br><em style="font-style:italic;color:var(--gold-light);">in un solo posto.</em></div>
+    <div class="dash-ui">
+      <!-- Topbar -->
+      <div class="dash-topbar">
+        <div class="dash-logo-row">
+          <svg width="22" height="22" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="7" fill="#1B4332"/><rect x="10" y="10" width="7" height="28" fill="#F8F6F2"/><rect x="10" y="10" width="32" height="6" fill="#F8F6F2"/><rect x="10" y="22" width="18" height="5" fill="#F8F6F2"/></svg>
+          Fatture per Forfettari
+        </div>
+        <div class="dash-topbar-right">
+          <div class="dash-year">2025</div>
+          <div class="dash-badge">RF19</div>
+          <div style="width:28px;height:28px;background:var(--forest);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;">G</div>
+        </div>
+      </div>
+      <!-- Body -->
+      <div class="dash-body">
+        <!-- Sidebar -->
+        <div class="dash-sidebar">
+          <div class="dash-sidebar-title">Menu</div>
+          <div class="dash-nav-item active"><div class="dash-nav-icon" style="background:rgba(27,67,50,.1);">🏠</div>Dashboard</div>
+          <div class="dash-nav-item"><div class="dash-nav-icon" style="background:rgba(0,0,0,.05);">📄</div>Fatture</div>
+          <div class="dash-nav-item"><div class="dash-nav-icon" style="background:rgba(0,0,0,.05);">👥</div>Clienti</div>
+          <div class="dash-nav-item"><div class="dash-nav-icon" style="background:rgba(239,68,68,.1);">📅</div>Scadenze</div>
+          <div class="dash-nav-item"><div class="dash-nav-icon" style="background:rgba(0,0,0,.05);">⚙️</div>Impostazioni</div>
+          <div style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px;">
+            <div style="background:var(--forest);color:white;text-align:center;font-size:12px;font-weight:600;padding:10px;border-radius:10px;cursor:pointer;">+ Nuova fattura</div>
+          </div>
+        </div>
+        <!-- Main -->
+        <div class="dash-main">
+          <!-- 85k hero -->
+          <div class="dash-hero-stat">
+            <div class="dash-hero-left">
+              <div class="dash-hero-label">Ciao Giorgio 👋 · Fatturato 2025</div>
+              <div class="dash-hero-val">€ 52.400</div>
+              <div class="dash-hero-sub">Limite: 85.000 € · Rimangono € 32.600</div>
+              <div class="dash-hero-bar"><div class="dash-hero-fill"></div></div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-family:var(--serif);font-size:32px;font-weight:900;color:var(--gold);line-height:1;">61,6%</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:4px;">utilizzato</div>
+            </div>
+          </div>
+          <!-- Stats row -->
+          <div class="dash-stats-row">
+            <div class="dash-stat">
+              <div class="dash-stat-label">Fatture 2025</div>
+              <div class="dash-stat-val">47</div>
+              <div class="dash-stat-sub">+3 questo mese</div>
+            </div>
+            <div class="dash-stat">
+              <div class="dash-stat-label">Da incassare</div>
+              <div class="dash-stat-val">€ 3.800</div>
+              <div class="dash-stat-sub" style="color:#F97316;">2 fatture aperte</div>
+            </div>
+            <div class="dash-stat">
+              <div class="dash-stat-label">Prossima scadenza</div>
+              <div class="dash-stat-val" style="font-size:16px;color:#EF4444;">31 maggio</div>
+              <div class="dash-stat-sub">Bollo 1° trim. · € 16</div>
+            </div>
+          </div>
+          <!-- Fatture recenti -->
+          <div class="dash-section-label">Ultime fatture</div>
+          <div class="dash-invoice-row">
+            <div class="dash-inv-avatar">AC</div>
+            <div class="dash-inv-info"><div class="dash-inv-name">Acme S.r.l.</div><div class="dash-inv-date">15 maggio 2025</div></div>
+            <div class="dash-inv-amt">€ 2.002</div>
+            <div class="dash-inv-badge sent">Inviata</div>
+          </div>
+          <div class="dash-invoice-row">
+            <div class="dash-inv-avatar" style="background:#2563EB;">SB</div>
+            <div class="dash-inv-info"><div class="dash-inv-name">Studio Bianchi</div><div class="dash-inv-date">8 maggio 2025</div></div>
+            <div class="dash-inv-amt">€ 1.502</div>
+            <div class="dash-inv-badge cash">Incassata</div>
+          </div>
+          <div class="dash-invoice-row">
+            <div class="dash-inv-avatar" style="background:#7C3AED;">MT</div>
+            <div class="dash-inv-info"><div class="dash-inv-name">Mario Tecnologia</div><div class="dash-inv-date">2 maggio 2025</div></div>
+            <div class="dash-inv-amt">€ 3.500</div>
+            <div class="dash-inv-badge cash">Incassata</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SCADENZE + MONITOR 85k: layout compatto #13 ── -->
+<div class="r2" style="grid-template-columns:7fr 5fr;" id="funzionalita">
+  <div class="card fu scad-compact" style="background:#DBE8F0;">
+    <div class="eyebrow" style="color:#2563EB;">Scadenze fiscali</div>
+    <h2 class="stitle">Mai più una scadenza <em>dimenticata</em></h2>
+    <!-- #13: layout a due colonne per ottimizzare spazio -->
+    <div class="scad-inner">
+      <p class="sbody">INPS, bollo trimestrale, imposta sostitutiva e Modello Redditi PF — tutti calcolati e in ordine di urgenza.</p>
+      <div class="scad-list">
+        <div class="scad-list-title">Prossime scadenze</div>
+        <div class="scad-item"><div class="scad-dot" style="background:#EF4444;"></div><div class="scad-info"><div class="scad-name">Bollo 1° trim.</div><div class="scad-sub">31 mag · F24 2521</div></div><div class="scad-amt">€ 16</div></div>
+        <div class="scad-item"><div class="scad-dot" style="background:#F97316;"></div><div class="scad-info"><div class="scad-name">Saldo + 1° acconto</div><div class="scad-sub">30 giu · F24 1792</div></div><div class="scad-amt">€ 3.200</div></div>
+        <div class="scad-item"><div class="scad-dot" style="background:var(--forest);"></div><div class="scad-info"><div class="scad-name">Modello Redditi PF</div><div class="scad-sub">30 settembre</div></div><div class="scad-amt" style="color:var(--muted);">—</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card fu d1 scad-compact" style="background:#E8DDD4;">
+    <div class="eyebrow" style="color:var(--gold);">Monitor 85.000 €</div>
+    <h2 class="stitle">Sai sempre<br>dove sei</h2>
+    <div id="monitor-widget">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Fatturato 2025</div>
+      <div id="mon-num">€ 40.000</div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:14px;" id="mon-fraction">40.000 / 85.000 €</div>
+      <div class="mon-track"><div id="mon-bar" style="width:47%;"></div></div>
+      <div class="mon-meta">
+        <span style="font-size:11px;font-weight:600;color:var(--forest);" id="mon-pct">47,1%</span>
+        <span style="font-size:11px;color:var(--muted);" id="mon-rem">Rimangono € 45.000</span>
+      </div>
+      <div class="months">
+        <div class="month-bar"><div class="month-fill active" style="height:65%;"></div></div>
+        <div class="month-bar"><div class="month-fill active" style="height:72%;"></div></div>
+        <div class="month-bar"><div class="month-fill active" style="height:58%;"></div></div>
+        <div class="month-bar"><div class="month-fill active" style="height:80%;"></div></div>
+        <div class="month-bar"><div class="month-fill active" style="height:45%;"></div></div>
+        <div class="month-bar"><div class="month-fill active" style="height:90%;"></div></div>
+        <div class="month-bar"><div class="month-fill active" style="height:70%;"></div></div>
+        <div class="month-bar"><div class="month-fill" style="height:0%;"></div></div>
+        <div class="month-bar"><div class="month-fill" style="height:0%;"></div></div>
+        <div class="month-bar"><div class="month-fill" style="height:0%;"></div></div>
+        <div class="month-bar"><div class="month-fill" style="height:0%;"></div></div>
+        <div class="month-bar"><div class="month-fill" style="height:0%;"></div></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:5px;"><span style="font-size:10px;color:var(--muted);">Gen</span><span style="font-size:10px;color:var(--muted);">Dic</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FEATURE: commercialista + import ── -->
+<div class="r2" style="grid-template-columns:1fr 1fr;">
+  <div class="card fu scad-compact" style="background:#E4EED2;min-height:auto;">
+    <div class="eyebrow">Dichiarazione redditi</div>
+    <h2 class="stitle" style="font-size:clamp(22px,2.5vw,34px);">Il riepilogo pronto per commercialista o CAF</h2>
+    <p class="sbody">PDF con incassi, ATECO, reddito imponibile e valori Quadro LM pre-calcolati. Utile anche per dichiarazione autonoma.</p>
+  </div>
+  <div class="card fu d1 scad-compact" style="background:#F0E8D4;min-height:auto;">
+    <div class="eyebrow" style="color:var(--gold);">Import storico</div>
+    <h2 class="stitle" style="font-size:clamp(22px,2.5vw,34px);">Vieni da un altro gestionale?</h2>
+    <p class="sbody">Importa le tue fatture storiche con un CSV standard. Le istruzioni su come esportare le trovi direttamente nell'app.</p>
+  </div>
+</div>
+
+<!-- ── #5/#6: APP SECTION con iPhone mockup CSS ── -->
+<div class="card fu app-section">
+  <div class="app-bg"></div>
+  <div class="app-left">
+    <!-- #6: solo titolo, niente sottotesto -->
+    <div class="eyebrow" style="color:#7C4A1E;">App mobile</div>
+    <div class="app-big-title">Fatture<br><em>on the go.</em></div>
+    <div class="app-store-btns">
+      <a href="#" style="display:inline-flex;align-items:center;gap:10px;background:#000;color:white;padding:12px 20px;border-radius:100px;font-family:var(--sans);font-size:14px;font-weight:600;letter-spacing:-.01em;">
+        <svg width="18" height="22" viewBox="0 0 18 22" fill="white"><path d="M14.94 11.95c-.02-2.17 1.78-3.22 1.86-3.27-1.01-1.48-2.58-1.68-3.14-1.7-1.33-.13-2.6.78-3.27.78-.67 0-1.7-.76-2.8-.74-1.44.02-2.77.84-3.5 2.12-1.5 2.6-.38 6.45 1.07 8.56.72 1.03 1.56 2.19 2.67 2.15 1.08-.04 1.48-.69 2.78-.69 1.3 0 1.65.69 2.78.67 1.15-.02 1.88-1.05 2.58-2.09.82-1.18 1.15-2.34 1.17-2.4-.03-.01-2.2-.84-2.2-3.39zM12.73 4.46c.58-.71.98-1.7.87-2.69-.84.03-1.86.56-2.46 1.27-.54.62-1.02 1.62-.89 2.57.94.07 1.89-.47 2.48-1.15z"/></svg>
+        App Store
+      </a>
+      <a href="#" style="display:inline-flex;align-items:center;gap:10px;background:rgba(0,0,0,.07);color:var(--ink);padding:12px 20px;border-radius:100px;font-family:var(--sans);font-size:14px;font-weight:600;letter-spacing:-.01em;">
+        <svg width="18" height="20" viewBox="0 0 18 20" fill="none"><path d="M1 1l8.5 9L1 19M1 1h9.5L17 5.5M1 19h9.5L17 14.5M17 5.5L17 14.5" stroke="#1B4332" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Google Play
+      </a>
+    </div>
+    <div style="margin-top:16px;font-family:var(--sans);font-size:12px;color:var(--muted);font-weight:500;">Disponibile prossimamente · Già usabile da browser</div>
+  </div>
+
+  <!-- #5: iPhone CSS con dashboard mobile dentro -->
+  <div class="app-right">
+    <div style="position:relative;">
+      <div class="iphone">
+        <div class="iphone-notch"></div>
+        <div class="iphone-screen">
+          <div class="iphone-statusbar">
+            <span>9:41</span>
+            <span>●●●</span>
+          </div>
+          <!-- Mobile app UI: stessa dashboard mobile che avevo disegnato -->
+          <div class="mob-topbar">
+            <div class="mob-greeting">Ciao, Giorgio 👋</div>
+            <div class="mob-name">Fatturato 2025</div>
+            <!-- 85k bar -->
+            <div class="mob-85k">
+              <div class="mob-85k-label">Fatturato</div>
+              <div class="mob-85k-val">€ 52.400</div>
+              <div class="mob-85k-track"><div class="mob-85k-fill"></div></div>
+              <div style="display:flex;justify-content:space-between;margin-top:5px;">
+                <span style="font-size:9px;color:rgba(255,255,255,.5);">61,6% di 85k</span>
+                <span style="font-size:9px;color:rgba(255,255,255,.5);">Rimangono 32.600</span>
+              </div>
+            </div>
+          </div>
+          <div class="mob-content">
+            <div class="mob-section-label">Ultime fatture</div>
+            <div class="mob-inv-row">
+              <div class="mob-inv-av">AC</div>
+              <div class="mob-inv-info"><div class="mob-inv-name">Acme S.r.l.</div><div class="mob-inv-date">15 mag · Inviata</div></div>
+              <div class="mob-inv-amt">€ 2.002</div>
+            </div>
+            <div class="mob-inv-row">
+              <div class="mob-inv-av" style="background:#2563EB;">SB</div>
+              <div class="mob-inv-info"><div class="mob-inv-name">Studio Bianchi</div><div class="mob-inv-date">8 mag · Incassata</div></div>
+              <div class="mob-inv-amt">€ 1.502</div>
+            </div>
+            <div class="mob-actions">
+              <div class="mob-action"><span class="mob-action-icon">📄</span><div class="mob-action-label">Nuova fattura</div></div>
+              <div class="mob-action"><span class="mob-action-icon">📅</span><div class="mob-action-label">Scadenze</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="iphone-float">⚡ Inviata via SdI</div>
+      <div class="iphone-float2">📅 Bollo: 31 maggio</div>
+    </div>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div class="card fu" style="background:var(--forest);padding:44px 0;overflow:hidden;">
+  <div style="font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.28);text-align:center;margin-bottom:28px;">Tutto incluso · nessun costo aggiuntivo</div>
+  <div style="display:flex;flex-direction:column;gap:12px;">
+    <div class="ticker-wrap"><div class="ticker-row" id="t1"></div></div>
+    <div class="ticker-wrap"><div class="ticker-row rev" id="t2"></div></div>
+  </div>
+</div>
+
+<!-- PRICING -->
+<div id="prezzi" class="card fu" style="background:#141A16;padding:80px 64px;text-align:center;">
+  <div style="font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.28);margin-bottom:16px;">Accesso anticipato</div>
+  <h2 style="font-family:var(--serif);font-size:clamp(32px,4vw,56px);line-height:1.06;letter-spacing:-.024em;font-weight:900;color:white;margin-bottom:16px;">Un piano.<br><em style="color:var(--gold);">Tutto incluso.</em></h2>
+  <p style="font-family:var(--sans);font-size:17px;color:rgba(255,255,255,.42);margin-bottom:56px;">Meno di un caffè al mese. Nessuna sorpresa, mai.</p>
+  <div style="display:inline-block;text-align:left;max-width:480px;width:100%;position:relative;">
+    <div style="position:absolute;top:-16px;left:50%;transform:translateX(-50%);background:var(--gold);color:var(--forest);font-family:var(--sans);font-size:10px;font-weight:700;padding:5px 16px;border-radius:100px;letter-spacing:.08em;white-space:nowrap;">Piano unico · tutto incluso · nessuna sorpresa</div>
+    <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:22px;padding:40px;">
+      <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;">
+        <span style="font-family:var(--serif);font-weight:700;font-size:22px;color:rgba(255,255,255,.38);">EUR</span>
+        <span style="font-family:var(--serif);font-weight:900;font-size:72px;line-height:1;letter-spacing:-.03em;color:white;">29,90</span>
+      </div>
+      <div style="font-family:var(--sans);font-size:14px;color:rgba(255,255,255,.32);margin-bottom:28px;">all'anno, IVA inclusa · meno di 2,50€ al mese</div>
+      <div style="margin-bottom:28px;">
+        <div class="pf"><div class="pc"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#52B788" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Fatture elettroniche illimitate via SdI</div>
+        <div class="pf"><div class="pc"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#52B788" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Monitor fatturato 85.000 € in real-time</div>
+        <div class="pf"><div class="pc"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#52B788" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Scadenze fiscali complete · INPS · bolli F24 · Redditi</div>
+        <div class="pf"><div class="pc"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#52B788" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Export PDF Quadro LM per commercialista o CAF</div>
+        <div class="pf"><div class="pc"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#52B788" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Tracciamento pagamenti · solleciti · note di credito</div>
+        <div class="pf"><div class="pc"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#52B788" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Clienti illimitati · import CSV · conservazione 10 anni</div>
+        <div class="pf"><div class="pc"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#52B788" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>App mobile · accesso anticipato · supporto diretto</div>
+      </div>
+      <a href="#inizia" id="inizia" style="display:block;width:100%;background:var(--forest);color:white;text-align:center;font-family:var(--sans);font-size:16px;font-weight:600;padding:16px;border-radius:100px;letter-spacing:-.01em;transition:background .15s,transform .2s;">Richiedi accesso anticipato</a>
+      <div style="font-family:var(--sans);font-size:12px;color:rgba(255,255,255,.22);text-align:center;margin-top:16px;">Nessuna carta richiesta · 30 giorni per provare · disdici quando vuoi</div>
+    </div>
+  </div>
+</div>
+
+<!-- TESTIMONIALS -->
+<div class="card fu" style="background:#D4EDDF;padding:72px 64px;">
+  <div style="text-align:center;margin-bottom:48px;">
+    <div class="eyebrow" style="display:block;">Beta tester · Accesso anticipato</div>
+    <h2 style="font-family:var(--serif);font-size:clamp(28px,3.5vw,46px);line-height:1.06;letter-spacing:-.022em;font-weight:900;color:var(--ink);">Cosa dicono<br>i primi forfettari</h2>
+  </div>
+  <div class="testi-grid">
+    <div class="testi fu d1">
+      <p style="font-family:var(--serif);font-size:16px;font-style:italic;font-weight:400;line-height:1.6;color:var(--ink);margin-bottom:20px;">"Finalmente un'app che non mi fa venire l'ansia. 3 click e la fattura è inviata."</p>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--forest);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0;">AC</div>
+        <div>
+          <div style="font-family:var(--sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);">Alessia C.</div>
+          <div style="font-family:var(--sans);font-size:10px;color:var(--muted);opacity:.6;">Consulente marketing · forfettaria</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi fu d2">
+      <p style="font-family:var(--serif);font-size:16px;font-style:italic;font-weight:400;line-height:1.6;color:var(--ink);margin-bottom:20px;">"Le scadenze fiscali calcolate in automatico sono una rivoluzione. Non mi dimentico più niente."</p>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#2D6A4F;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0;">MT</div>
+        <div>
+          <div style="font-family:var(--sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);">Marco T.</div>
+          <div style="font-family:var(--sans);font-size:10px;color:var(--muted);opacity:.6;">Sviluppatore freelance · forfettario</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi fu d3">
+      <p style="font-family:var(--serif);font-size:16px;font-style:italic;font-weight:400;line-height:1.6;color:var(--ink);margin-bottom:20px;">"Ho cambiato gestionale senza perdere nulla. Setup in 10 minuti, storico importato, costa la metà."</p>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#52B788;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0;">SB</div>
+        <div>
+          <div style="font-family:var(--sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);">Sara B.</div>
+          <div style="font-family:var(--sans);font-size:10px;color:var(--muted);opacity:.6;">Graphic designer · forfettaria</div>
+        </div>
+      </div>
+    </div>
+    <div class="testi fu d4">
+      <p style="font-family:var(--serif);font-size:16px;font-style:italic;font-weight:400;line-height:1.6;color:var(--ink);margin-bottom:20px;">"Il PDF con i valori Quadro LM già pronti mi ha salvato ore con il commercialista."</p>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#C9A84C;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0;">DM</div>
+        <div>
+          <div style="font-family:var(--sans);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);">Davide M.</div>
+          <div style="font-family:var(--sans);font-size:10px;color:var(--muted);opacity:.6;">Fotografo · forfettario</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div id="faq" class="card fu" style="background:#ECF4F0;">
+  <div class="faq-section">
+    <div class="faq-header">
+      <div class="faq-eyebrow">FAQ</div>
+      <h2 class="faq-title">Domande frequenti</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item open">
+        <button class="faq-q">Questo fa per me?<div class="faq-icon"><span class="faq-plus">+</span></div></button>
+        <div class="faq-a"><p>Se hai una partita IVA in regime forfettario, sì — è fatto esattamente per te. Se hai una partita IVA ordinaria, sei una società, o vuoi gestire la liquidazione IVA e la prima nota, no: ci sono strumenti più adatti. Noi facciamo una cosa sola, la facciamo bene, e la facciamo solo per i forfettari.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Cos'è l'accesso anticipato?<div class="faq-icon"><span class="faq-plus">+</span></div></button>
+        <div class="faq-a"><p>Stiamo aprendo la piattaforma ai primi forfettari. Accesso anticipato significa che entri prima degli altri, usi il prodotto completo, e ci aiuti a migliorarlo con il tuo feedback. In cambio, hai 30 giorni completi per provare tutto senza carta di credito. Il prezzo è 29,90€/anno, IVA inclusa.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">La fattura è davvero a norma di legge?<div class="faq-icon"><span class="faq-plus">+</span></div></button>
+        <div class="faq-a"><p>Sì, completamente. Genera fatture XML con regime RF19, natura IVA N2.2, aliquota 0%, e la dicitura obbligatoria dell'art. 1, commi 54-89, della L. 190/2014. Il bollo virtuale da 2€ si aggiunge automaticamente sulle fatture superiori a 77,47€. Non devi sapere cosa significano queste cose: ci pensiamo noi.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Devo installare qualcosa?<div class="faq-icon"><span class="faq-plus">+</span></div></button>
+        <div class="faq-a"><p>No. Funziona direttamente dal browser, su qualsiasi dispositivo. L'app mobile per iOS e Android è in arrivo. Nessun software da installare, nessuna configurazione, nessuna competenza tecnica richiesta.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Vengo da un altro gestionale. Posso portare le mie fatture?<div class="faq-icon"><span class="faq-plus">+</span></div></button>
+        <div class="faq-a"><p>Sì. Accetta l'importazione di fatture storiche tramite CSV standard. Dentro l'app trovi le istruzioni su come esportare dal tuo vecchio software. Di solito bastano 10-15 minuti per migrare tutto lo storico.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q">Come ottengo il riepilogo per il commercialista?<div class="faq-icon"><span class="faq-plus">+</span></div></button>
+        <div class="faq-a"><p>Con un click scarichi un PDF con incassi dell'anno (principio di cassa), ATECO, reddito imponibile, contributi INPS dedotti e valori pre-calcolati per il Quadro LM. Puoi mandarlo al commercialista, al CAF, o usarlo per la dichiarazione autonoma.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA FINALE -->
+<div class="card fu" style="background:var(--forest);padding:80px 64px;text-align:center;margin-bottom:10px;">
+  <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:100px;padding:7px 16px;margin-bottom:28px;">
+    <span style="width:7px;height:7px;border-radius:50%;background:var(--gold);display:inline-block;flex-shrink:0;animation:pulse 2s ease-in-out infinite;"></span>
+    <span style="font-family:var(--sans);font-size:12px;font-weight:600;color:rgba(255,255,255,.8);letter-spacing:.02em;">Accesso anticipato aperto</span>
+  </div>
+  <h2 style="font-family:var(--serif);font-size:clamp(32px,4.5vw,60px);line-height:1.04;letter-spacing:-.026em;font-weight:900;color:white;margin-bottom:16px;">Il gestionale<br><em style="color:var(--gold-light);font-style:italic;font-weight:400;">dei forfettari.</em></h2>
+  <p style="font-family:var(--sans);font-size:18px;color:rgba(255,255,255,.55);margin-bottom:40px;max-width:420px;margin-left:auto;margin-right:auto;line-height:1.6;">Costruito solo per il regime forfettario.<br>Nient'altro.</p>
+  <a href="#inizia" style="display:inline-flex;align-items:center;gap:10px;background:white;color:var(--forest);font-family:var(--sans);font-size:16px;font-weight:700;padding:16px 36px;border-radius:100px;letter-spacing:-.01em;transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .2s;box-shadow:0 4px 20px rgba(0,0,0,.15);">
+    Richiedi accesso anticipato
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="var(--forest)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+  <div style="font-family:var(--sans);font-size:13px;color:rgba(255,255,255,.35);margin-top:20px;">30 giorni gratis · nessuna carta · disdici quando vuoi</div>
+</div>
+
+<!-- FOOTER -->
+<div class="card" style="background:#141A16;padding:56px 64px 40px;margin-bottom:14px;">
+  <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:40px;margin-bottom:48px;">
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <svg width="30" height="30" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="7" fill="#1B4332"/><rect x="10" y="10" width="7" height="28" fill="#F8F6F2"/><rect x="10" y="10" width="32" height="6" fill="#F8F6F2"/><rect x="10" y="22" width="18" height="5" fill="#F8F6F2"/></svg>
+        <span style="font-family:var(--sans);font-weight:600;font-size:16px;color:white;letter-spacing:-.01em;">Fatture per Forfettari</span>
+      </div>
+      <p style="font-family:var(--sans);font-size:14px;color:rgba(255,255,255,.28);line-height:1.7;max-width:240px;">Il gestionale dei forfettari. Costruito solo per il regime forfettario. Nient'altro.</p>
+    </div>
+    <div style="display:flex;gap:56px;flex-wrap:wrap;">
+      <div><h4 style="font-family:var(--sans);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:rgba(255,255,255,.2);margin-bottom:16px;">Prodotto</h4><a href="#perche" class="fl">Perché FpF</a><a href="#come-funziona" class="fl">Come funziona</a><a href="#prezzi" class="fl">Prezzi</a><a href="#faq" class="fl">FAQ</a></div>
+      <div><h4 style="font-family:var(--sans);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:rgba(255,255,255,.2);margin-bottom:16px;">Legale</h4><a href="#" class="fl">Termini</a><a href="#" class="fl">Privacy</a><a href="#" class="fl">Cookie</a><a href="#" class="fl">Contattaci</a></div>
+    </div>
+  </div>
+  <div style="border-top:1px solid rgba(255,255,255,.06);padding-top:24px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;">
+    <span style="font-family:var(--sans);font-size:12px;color:rgba(255,255,255,.16);">© 2026 Fatture per Forfettari · fatturo.it</span>
+    <span style="font-family:var(--sans);font-size:12px;color:rgba(255,255,255,.16);">P.IVA in corso di apertura</span>
+  </div>
+</div>
+
+</div><!-- /sec -->
+
+<script>
+// HERO CANVAS
+(function(){
+  const cv=document.getElementById('hero-canvas');
+  if(!cv)return;
+  const ctx=cv.getContext('2d');
+  function resize(){
+    const card=document.getElementById('hero-card');
+    cv.width=card?card.offsetWidth:window.innerWidth;
+    cv.height=card?card.offsetHeight:window.innerHeight;
+  }
+  resize();window.addEventListener('resize',resize);
+  const N=55,MD=0.18;
+  const pts=Array.from({length:N},()=>({x:Math.random(),y:Math.random(),vx:(Math.random()-.5)*.00014,vy:(Math.random()-.5)*.00014,r:Math.random()*2+1,a:Math.random()*.35+.08}));
+  function draw(){
+    const W=cv.width,H=cv.height;ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0)p.x=1;if(p.x>1)p.x=0;if(p.y<0)p.y=1;if(p.y>1)p.y=0;});
+    for(let i=0;i<N;i++)for(let j=i+1;j<N;j++){
+      const a=pts[i],b=pts[j],dx=a.x-b.x,dy=a.y-b.y,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<MD){ctx.beginPath();ctx.strokeStyle=`rgba(255,255,255,${(1-d/MD)*.1})`;ctx.lineWidth=.7;ctx.moveTo(a.x*W,a.y*H);ctx.lineTo(b.x*W,b.y*H);ctx.stroke();}
+    }
+    pts.forEach(p=>{ctx.beginPath();ctx.arc(p.x*W,p.y*H,p.r,0,Math.PI*2);ctx.fillStyle=`rgba(255,255,255,${p.a})`;ctx.fill();});
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+
+// #9: HERO PARALLAX — sfondo si muove con lo scroll
+(function(){
+  const bg=document.getElementById('hero-bg');
+  if(!bg)return;
+  function onScroll(){
+    const y=window.scrollY;
+    // muove il background verso l'alto mentre scrolli
+    bg.style.transform=`translateY(${y*0.35}px)`;
+  }
+  window.addEventListener('scroll',onScroll,{passive:true});
+})();
+
+// TICKER
+const t1=['Solo per forfettari','IVA? No grazie.','Invio diretto SdI','Bollo automatico','RF19 · N2.2 già impostati','Monitor 85k','Scadenze fiscali complete'];
+const t2=['Non puoi sbagliare','Apri. Compila. Invia.','Import storico CSV','Clienti illimitati','Conservazione 10 anni','Calcolo INPS automatico','Export Quadro LM'];
+const svgSend='<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 8h10M8 4l4 4-4 4" stroke="rgba(255,255,255,.6)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const svgDoc='<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="3" y="1" width="10" height="14" rx="2" stroke="rgba(255,255,255,.6)" stroke-width="1.3"/><line x1="5.5" y1="7" x2="10.5" y2="7" stroke="rgba(255,255,255,.6)" stroke-width="1.2" stroke-linecap="round"/><line x1="5.5" y1="9.5" x2="10.5" y2="9.5" stroke="rgba(255,255,255,.6)" stroke-width="1.2" stroke-linecap="round"/></svg>';
+const svgCheck='<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="rgba(255,255,255,.6)" stroke-width="1.3"/><polyline points="5,8 7,10 11,6" stroke="rgba(255,255,255,.6)" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const svgCal='<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="12" rx="2" stroke="rgba(255,255,255,.6)" stroke-width="1.3"/><line x1="5" y1="1" x2="5" y2="5" stroke="rgba(255,255,255,.6)" stroke-width="1.3" stroke-linecap="round"/><line x1="11" y1="1" x2="11" y2="5" stroke="rgba(255,255,255,.6)" stroke-width="1.3" stroke-linecap="round"/><line x1="1" y1="7" x2="15" y2="7" stroke="rgba(255,255,255,.6)" stroke-width="1.2"/></svg>';
+const svgStar='<svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 1.5l1.73 3.5 3.87.56-2.8 2.73.66 3.85L8 10.27l-3.46 1.87.66-3.85L2.4 5.56l3.87-.56z" stroke="rgba(255,255,255,.6)" stroke-width="1.2" stroke-linejoin="round"/></svg>';
+const i1=[svgCheck,svgDoc,svgSend,svgCheck,svgDoc,svgCal,svgCal];
+const i2=[svgStar,svgSend,svgDoc,svgCheck,svgCal,svgDoc,svgStar];
+function mkT(id,it,ic){const el=document.getElementById(id);if(!el)return;const all=[...it,...it,...it];el.innerHTML=all.map((t,i)=>`<span style="display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.09);color:rgba(255,255,255,.72);border-radius:100px;padding:9px 18px;font-family:var(--sans);font-size:13px;font-weight:500;white-space:nowrap;">${ic[i%ic.length]}${t}</span>`).join('');}
+mkT('t1',t1,i1);mkT('t2',t2,i2);
+
+// SCROLL REVEAL
+const obs=new IntersectionObserver(e=>e.forEach(en=>{if(en.isIntersecting){en.target.classList.add('in');obs.unobserve(en.target);}}),{threshold:.08,rootMargin:'0px 0px -30px 0px'});
+document.querySelectorAll('.fu').forEach(el=>obs.observe(el));
+
+// #7/#8: MONITOR 85k — bidirezionale scroll-driven
+// #7: si ferma a 55k (range ridotto: 40k-55k invece di 40k-55k su tutto lo scroll dell'elemento)
+(function(){
+  const numEl=document.getElementById('mon-num');
+  const barEl=document.getElementById('mon-bar');
+  const pctEl=document.getElementById('mon-pct');
+  const remEl=document.getElementById('mon-rem');
+  const fracEl=document.getElementById('mon-fraction');
+  const widget=document.getElementById('monitor-widget');
+  if(!widget||!numEl)return;
+  const MIN=40000,MAX=55000,TOTAL=85000;
+  function fmt(v){return v.toLocaleString('it-IT');}
+  function update(v){
+    const pct=v/TOTAL*100;
+    numEl.textContent='€ '+fmt(Math.round(v));
+    if(fracEl)fracEl.textContent=fmt(Math.round(v))+' / 85.000 €';
+    if(barEl)barEl.style.width=pct.toFixed(1)+'%';
+    if(pctEl)pctEl.textContent=pct.toFixed(1)+'%';
+    if(remEl)remEl.textContent='Rimangono € '+fmt(Math.round(TOTAL-v));
+  }
+  function getProgress(){
+    const rect=widget.getBoundingClientRect();
+    const wh=window.innerHeight;
+    // #7: usa solo il 60% dello scroll range per fermarsi prima
+    const p=(1-(rect.bottom)/(wh+rect.height)) / 0.6;
+    return Math.max(0,Math.min(1,p));
+  }
+  function onScroll(){update(MIN+(MAX-MIN)*getProgress());}
+  update(MIN);
+  window.addEventListener('scroll',onScroll,{passive:true});
+  onScroll();
+})();
+
+// CURSOR
+const dot=document.getElementById('dot');
+if(dot)document.addEventListener('mousemove',e=>{dot.style.left=e.clientX+'px';dot.style.top=e.clientY+'px';},{passive:true});
+
+// SMOOTH SCROLL
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{const id=a.getAttribute('href').slice(1);if(!id)return;const el=document.getElementById(id);if(el){e.preventDefault();el.scrollIntoView({behavior:'smooth',block:'start'});}}));
+
+// FAQ accordion
+document.querySelectorAll('.faq-q').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const item=btn.parentElement;
+    const isOpen=item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+    if(!isOpen)item.classList.add('open');
+  });
+});
+</script>
+</body>
+</html>
