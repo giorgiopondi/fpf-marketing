@@ -402,7 +402,9 @@ a{text-decoration:none;color:inherit;}
       <h1 class="hero-h1">Il gestionale<br><em>dei forfettari.</em></h1>
       <p class="hero-sub">Costruito solo per il regime forfettario. Nient'altro.</p>
       <div class="hero-actions">
-        <a href="#inizia" class="btn-white">Richiedi accesso anticipato</a>
+        <a href="#inizia" class="btn-white" onclick="event.preventDefault();document.getElementById('inizia').scrollIntoView({behavior:'smooth'});setTimeout(()=>document.querySelector('#inizia input[type=email]').focus(),500)">
+          Richiedi accesso anticipato
+        </a>
       </div>
     </div>
   </div>
@@ -758,8 +760,15 @@ a{text-decoration:none;color:inherit;}
         <div class="pf"><div class="pc"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#52B788" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>Clienti illimitati · import CSV · conservazione 10 anni</div>
         <div class="pf"><div class="pc"><svg width="9" height="9" viewBox="0 0 12 12" fill="none"><polyline points="2,6 5,9 10,3" stroke="#52B788" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>App mobile · accesso anticipato · supporto diretto</div>
       </div>
-      <a href="#inizia" id="inizia" style="display:block;width:100%;background:var(--forest);color:white;text-align:center;font-family:var(--sans);font-size:16px;font-weight:600;padding:16px;border-radius:100px;letter-spacing:-.01em;transition:background .15s,transform .2s;">Richiedi accesso anticipato</a>
-      <div style="font-family:var(--sans);font-size:12px;color:rgba(255,255,255,.22);text-align:center;margin-top:16px;">Nessuna carta richiesta · 30 giorni per provare · disdici quando vuoi</div>
+      <form id="inizia" action="https://formspree.io/f/xpwzgvdo" method="POST" style="margin-bottom:0;" onsubmit="handleSubmit(event)">
+        <input type="hidden" name="_subject" value="Nuovo accesso anticipato - Fatture per Forfettari">
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <input type="email" name="email" required placeholder="la-tua@email.it" style="flex:1;padding:15px 18px;border:1.5px solid rgba(255,255,255,.15);border-radius:100px;background:rgba(255,255,255,.07);color:white;font-family:var(--sans);font-size:15px;outline:none;transition:border-color .2s;" onfocus="this.style.borderColor='rgba(255,255,255,.5)'" onblur="this.style.borderColor='rgba(255,255,255,.15)'" oninput="document.getElementById('submit-btn').style.opacity='1'">
+          <button id="submit-btn" type="submit" style="background:white;color:var(--forest);font-family:var(--sans);font-size:15px;font-weight:700;padding:15px 28px;border-radius:100px;border:none;cursor:pointer;letter-spacing:-.01em;transition:transform .2s,box-shadow .2s;white-space:nowrap;">Richiedi accesso →</button>
+        </div>
+        <div id="form-success" style="display:none;text-align:center;padding:16px;background:rgba(82,183,136,.15);border:1px solid rgba(82,183,136,.3);border-radius:14px;font-family:var(--sans);font-size:14px;color:#52B788;font-weight:500;">✓ Perfetto! Ti contatteremo appena l'accesso è disponibile.</div>
+      </form>
+      <div style="font-family:var(--sans);font-size:12px;color:rgba(255,255,255,.22);text-align:center;margin-top:14px;">Nessuna carta richiesta · 30 giorni per provare · disdici quando vuoi</div>
     </div>
   </div>
 </div>
@@ -858,7 +867,7 @@ a{text-decoration:none;color:inherit;}
   </div>
   <h2 style="font-family:var(--serif);font-size:clamp(32px,4.5vw,60px);line-height:1.04;letter-spacing:-.026em;font-weight:900;color:white;margin-bottom:16px;">Il gestionale<br><em style="color:var(--gold-light);font-style:italic;font-weight:400;">dei forfettari.</em></h2>
   <p style="font-family:var(--sans);font-size:18px;color:rgba(255,255,255,.55);margin-bottom:40px;max-width:420px;margin-left:auto;margin-right:auto;line-height:1.6;">Costruito solo per il regime forfettario.<br>Nient'altro.</p>
-  <a href="#inizia" style="display:inline-flex;align-items:center;gap:10px;background:white;color:var(--forest);font-family:var(--sans);font-size:16px;font-weight:700;padding:16px 36px;border-radius:100px;letter-spacing:-.01em;transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .2s;box-shadow:0 4px 20px rgba(0,0,0,.15);">
+  <a href="#inizia" onclick="event.preventDefault();document.getElementById('inizia').scrollIntoView({behavior:'smooth'});setTimeout(()=>document.querySelector('#inizia input[type=email]').focus(),500)" style="display:inline-flex;align-items:center;gap:10px;background:white;color:var(--forest);font-family:var(--sans);font-size:16px;font-weight:700;padding:16px 36px;border-radius:100px;letter-spacing:-.01em;transition:transform .25s cubic-bezier(.34,1.56,.64,1),box-shadow .2s;box-shadow:0 4px 20px rgba(0,0,0,.15);">
     Richiedi accesso anticipato
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="var(--forest)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </a>
@@ -977,7 +986,29 @@ document.querySelectorAll('.fu').forEach(el=>obs.observe(el));
   onScroll();
 })();
 
-// CURSOR
+// FORM SUBMIT
+function handleSubmit(e){
+  e.preventDefault();
+  const form=e.target;
+  const btn=document.getElementById('submit-btn');
+  const success=document.getElementById('form-success');
+  btn.textContent='Invio...';
+  btn.style.opacity='.6';
+  fetch(form.action,{method:'POST',body:new FormData(form),headers:{'Accept':'application/json'}})
+    .then(r=>{
+      if(r.ok){
+        form.querySelector('input[type=email]').style.display='none';
+        btn.style.display='none';
+        success.style.display='block';
+        // tracking
+        if(typeof gtag!=='undefined') gtag('event','signup',{event_category:'accesso_anticipato'});
+      } else {
+        btn.textContent='Riprova →';
+        btn.style.opacity='1';
+      }
+    })
+    .catch(()=>{btn.textContent='Riprova →';btn.style.opacity='1';});
+}
 const dot=document.getElementById('dot');
 if(dot)document.addEventListener('mousemove',e=>{dot.style.left=e.clientX+'px';dot.style.top=e.clientY+'px';},{passive:true});
 
