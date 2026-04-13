@@ -97,6 +97,26 @@ h1 em{
 @keyframes pop{
   to{transform:scale(1)}
 }
+.back-home{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  margin-top:18px;
+  padding:14px 22px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.06);
+  color:white;
+  font-weight:600;
+  font-size:15px;
+  cursor:pointer;
+  transition:background .2s ease, transform .2s ease, border-color .2s ease;
+}
+.back-home:hover{
+  background:rgba(255,255,255,.1);
+  border-color:rgba(255,255,255,.22);
+  transform:translateY(-1px);
+}
 .error-msg{
   display:none;
   margin-top:10px;
@@ -143,7 +163,8 @@ h1 em{
   <div class="check">✓</div>
   <h1 style="font-size:32px;">Perfetto.</h1>
   <div class="sub">Ti scriviamo appena si apre la prova.</div>
-  <div class="meta">Per domande: privacy@fattureperforfettari.it</div>
+  <div class="meta">Per domande: info@fattureperforfettari.it</div>
+  <a href="index.html" class="back-home">Torna alla homepage</a>
 </div>
 
 </div>
