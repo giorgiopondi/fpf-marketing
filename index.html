@@ -1095,6 +1095,39 @@ a{text-decoration:none;color:inherit;}
   transform:translate(-50%, -50%) scale(1.4);
 }
 
+/* ── DICHIARAZIONE SECTION ── */
+.decl-tab-panels .decl-panel{display:none;}
+.decl-tab-panels .decl-panel.active{display:block;}
+.decl-tabs{display:flex;gap:8px;margin:28px 0 0;flex-wrap:wrap;}
+.decl-tab{
+  font-family:var(--sans);font-size:13px;font-weight:600;
+  padding:10px 22px;border-radius:100px;cursor:pointer;
+  border:1.5px solid var(--border);background:white;
+  color:var(--muted);transition:all .2s var(--ease);letter-spacing:-.01em;
+}
+.decl-tab:hover{border-color:rgba(27,67,50,.25);color:var(--ink);}
+.decl-tab.active{background:var(--forest);color:white;border-color:var(--forest);}
+.decl-step{
+  display:flex;align-items:flex-start;gap:12px;
+  padding:11px 0;border-bottom:1px solid var(--border);
+}
+.decl-step:last-child{border-bottom:none;padding-bottom:0;}
+.decl-step-n{
+  font-family:var(--serif);font-weight:900;font-style:italic;
+  font-size:22px;color:rgba(0,0,0,.08);line-height:1.3;
+  flex-shrink:0;width:20px;text-align:right;
+}
+.decl-step-body{font-family:var(--sans);font-size:13.5px;color:var(--muted);line-height:1.55;}
+.decl-step-body strong{display:block;font-weight:600;color:var(--ink);margin-bottom:1px;font-size:13.5px;}
+.decl-panels-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:stretch;}
+.decl-steps-col{display:flex;flex-direction:column;justify-content:center;}
+@keyframes declIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+.decl-panel.active{animation:declIn .3s var(--ease);}
+@media(max-width:700px){
+  .decl-panels-grid{grid-template-columns:1fr;}
+  .decl-tab{padding:9px 16px;font-size:12px;}
+}
+
 </style>
 
 <link rel="apple-touch-icon" href="/icon.png">
@@ -1127,7 +1160,7 @@ a{text-decoration:none;color:inherit;}
     </a>
     <div class="nav-links">
       <a href="#perche">Perché sceglierci</a>
-      <a href="#come-funziona">Come funziona</a>
+      <a href="#dichiarazione">Fisco e Dichiarazioni</a>
       <a href="#prezzi">Prezzi</a>
     </div>
     <a href="accesso-anticipato.html" class="nav-cta">Accesso anticipato</a>
@@ -1155,7 +1188,7 @@ a{text-decoration:none;color:inherit;}
 <section id="perche" class="card fu why-section" style="background:var(--paper2);">
   <div class="inner">
     <div class="eyebrow">Perché sceglierci</div>
-    <h2 class="stitle" style="font-size:clamp(28px,3.5vw,46px);">Non siamo generalisti.<br><em>Solo un cliente: i forfettari.</em></h2>
+    <h2 class="stitle" style="font-size:clamp(28px,3.5vw,46px);">Il regime forfettario è semplice.<br><em>Gestiscilo da solo.</em></h2>
   </div>
   <div class="inner why-grid">
 
@@ -1170,15 +1203,15 @@ a{text-decoration:none;color:inherit;}
     </div>
 
     <div class="why-card fu d2">
-      <div class="why-icon gold">
+      <div class="why-icon green">
         <svg width="20" height="20" viewBox="0 0 22 22" fill="none">
-          <circle cx="11" cy="11" r="9" stroke="#C9A84C" stroke-width="1.5"/>
-          <circle cx="11" cy="11" r="5" stroke="#C9A84C" stroke-width="1.5"/>
-          <circle cx="11" cy="11" r="2" fill="#C9A84C"/>
+          <circle cx="11" cy="8" r="3.5" stroke="#1B4332" stroke-width="1.5"/>
+          <path d="M4 19c0-3.87 3.13-7 7-7s7 3.13 7 7" stroke="#1B4332" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M16 11l1.5 1.5L20 10" stroke="#1B4332" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-      <h3>IVA? No grazie.</h3>
-      <p>Sei in regime forfettario.<br>Non applichi IVA<br>e non devi configurare nulla.</p>
+      <h3>Il commercialista? Una volta l'anno, se vuoi.</h3>
+      <p>Fatture, scadenze e F24 li gestisci tu.<br>La dichiarazione la fai al CAF in un'ora<br>o da solo con la precompilata.</p>
     </div>
 
     <div class="why-card fu d3">
@@ -1381,19 +1414,118 @@ a{text-decoration:none;color:inherit;}
   </div>
 </div>
 
-<!-- ── FEATURE: commercialista + import ── -->
-<div class="r2" style="grid-template-columns:1fr 1fr;">
-  <div class="card fu scad-compact" style="background:#E4EED2;min-height:auto;">
-    <div class="eyebrow">Dichiarazione redditi</div>
-    <h2 class="stitle" style="font-size:clamp(22px,2.5vw,34px);">Il riepilogo pronto per commercialista o CAF</h2>
-    <p class="sbody">PDF con incassi, ATECO, reddito imponibile e valori Quadro LM pre-calcolati. Utile anche per dichiarazione autonoma.</p>
+
+<!-- ── DICHIARAZIONE: autonomia ── -->
+<section class="card fu scad-compact" id="dichiarazione" style="background:var(--paper2);">
+  <div class="inner">
+    <div class="eyebrow">Il tuo rapporto col fisco</div>
+    <h2 class="stitle">Il regime forfettario è semplice.<br><em>Gestiscilo da solo.</em></h2>
+    <p class="sbody" style="max-width:560px;margin-top:10px;">Con Fatture per Forfettari gestisci in autonomia fatture, scadenze e pagamenti F24. Per la dichiarazione dei redditi — una volta l'anno — hai tre strade.</p>
   </div>
-  <div class="card fu d1 scad-compact" style="background:#F0E8D4;min-height:auto;">
-    <div class="eyebrow" style="color:var(--gold);">Import storico</div>
-    <h2 class="stitle" style="font-size:clamp(22px,2.5vw,34px);">Vieni da un altro gestionale?</h2>
-    <p class="sbody">Importa le tue fatture storiche con un CSV standard. Le istruzioni su come esportare le trovi direttamente nell'app.</p>
+  <div class="inner why-grid" style="margin-top:40px;">
+    <div class="why-card fu d1">
+      <div class="why-icon green">
+        <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><path d="M12 2L4 13h7l-1 7 10-11h-7l1-7z" fill="#1B4332" opacity=".85" stroke="#1B4332" stroke-width=".3" stroke-linejoin="round"/></svg>
+      </div>
+      <h3>Fatture elettroniche.</h3>
+      <p>Compili i campi, la fattura parte al SdI e arriva al cliente. Zero configurazione, già impostato per il regime forfettario.</p>
+    </div>
+    <div class="why-card fu d2">
+      <div class="why-icon gold">
+        <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="9" stroke="#C9A84C" stroke-width="1.5"/><circle cx="11" cy="11" r="5" stroke="#C9A84C" stroke-width="1.5"/><circle cx="11" cy="11" r="2" fill="#C9A84C"/></svg>
+      </div>
+      <h3>F24 e bolli.</h3>
+      <p>Ti diciamo quando pagare e quanto. Il pagamento lo fai dall'home banking in 2 minuti. Nessuna sorpresa.</p>
+    </div>
+    <div class="why-card fu d3">
+      <div class="why-icon ink">
+        <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><rect x="3" y="3" width="16" height="16" rx="2" stroke="#111210" stroke-width="1.4"/><path d="M7 8h8M7 12h5" stroke="#111210" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </div>
+      <h3>Quadro LM pronto.</h3>
+      <p>Un PDF con tutti i valori già calcolati — incassi, reddito imponibile, imposta stimata. Portalo dove vuoi.</p>
+    </div>
   </div>
-</div>
+</section>
+
+<!-- ── DICHIARAZIONE: 3 opzioni ── -->
+<section class="card fu scad-compact" style="background:white;">
+  <div class="inner">
+    <div class="eyebrow">E la dichiarazione dei redditi?</div>
+    <h2 class="stitle" style="font-size:clamp(24px,3vw,40px);">Una volta l'anno.<br><em>Tre strade. Scegli la tua.</em></h2>
+    <div class="decl-tabs">
+      <button class="decl-tab active" onclick="declTab(0)">In autonomia</button>
+      <button class="decl-tab" onclick="declTab(1)">Con il CAF</button>
+      <button class="decl-tab" onclick="declTab(2)">Con il commercialista</button>
+    </div>
+  </div>
+  <div class="inner decl-tab-panels" style="margin-top:32px;">
+
+    <div class="decl-panel active" id="dp0">
+      <div class="decl-panels-grid">
+        <div class="why-card" style="background:var(--forest-pale);border-color:rgba(27,67,50,.12);">
+          <div class="why-icon green" style="margin-bottom:16px;">
+            <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><polyline points="4,11 9,16 18,6" stroke="#1B4332" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h3 style="font-size:18px;">Fai tutto da solo</h3>
+          <p style="margin-top:8px;">Accedi alla dichiarazione precompilata dell'Agenzia delle Entrate con SPID o CIE. I valori dal PDF li inserisci nel Quadro LM. Meno di un'ora.</p>
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(27,67,50,.1);">
+            <span style="font-family:var(--serif);font-size:28px;font-weight:900;color:var(--forest);">€ 0</span>
+            <span style="font-family:var(--sans);font-size:12px;color:var(--muted);margin-left:8px;">costo aggiuntivo</span>
+          </div>
+        </div>
+        <div class="decl-steps-col">
+          <div class="decl-step"><div class="decl-step-n">1</div><div class="decl-step-body"><strong>Esporta il PDF Quadro LM</strong>Incassi, reddito imponibile e imposta stimata già calcolati dall'app.</div></div>
+          <div class="decl-step"><div class="decl-step-n">2</div><div class="decl-step-body"><strong>Apri la dichiarazione precompilata</strong>Sul sito dell'Agenzia delle Entrate. La trovi già parzialmente compilata con i tuoi dati.</div></div>
+          <div class="decl-step"><div class="decl-step-n">3</div><div class="decl-step-body"><strong>Compila il Quadro LM</strong>Inserisci i valori dal PDF. Ci vogliono 20 minuti se sai dove cliccare.</div></div>
+          <div class="decl-step"><div class="decl-step-n">4</div><div class="decl-step-body"><strong>Invia e paga l'imposta</strong>L'imposta sostitutiva la versi con F24. Ti diciamo noi importo e scadenza.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="decl-panel" id="dp1">
+      <div class="decl-panels-grid">
+        <div class="why-card" style="background:#EEF4FB;border-color:rgba(37,99,235,.12);">
+          <div class="why-icon" style="margin-bottom:16px;background:rgba(37,99,235,.1);">
+            <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="9" r="4" stroke="#2563EB" stroke-width="1.5"/><path d="M4 20c0-3.87 3.13-7 7-7s7 3.13 7 7" stroke="#2563EB" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <h3 style="font-size:18px;">Un appuntamento l'anno</h3>
+          <p style="margin-top:8px;">Vai al CAF con il PDF. Loro compilano e inviano la dichiarazione per te. Un'ora di appuntamento, ricevuta in mano.</p>
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(37,99,235,.1);">
+            <span style="font-family:var(--serif);font-size:28px;font-weight:900;color:#2563EB;">50–80€</span>
+            <span style="font-family:var(--sans);font-size:12px;color:var(--muted);margin-left:8px;">una volta l'anno</span>
+          </div>
+        </div>
+        <div class="decl-steps-col">
+          <div class="decl-step"><div class="decl-step-n">1</div><div class="decl-step-body"><strong>Esporta il PDF Quadro LM</strong>Stampalo o portalo sul telefono. Ha già tutto quello che il CAF ti chiederà.</div></div>
+          <div class="decl-step"><div class="decl-step-n">2</div><div class="decl-step-body"><strong>Prenota al CAF</strong>ACLI, CGIL, CISL o il CAF della tua banca. Di solito disponibili in pochi giorni nei mesi di maggio-giugno.</div></div>
+          <div class="decl-step"><div class="decl-step-n">3</div><div class="decl-step-body"><strong>Un'ora e hai finito</strong>Compilano e inviano tutto. Ricevi la ricevuta. Il pagamento dell'imposta lo gestisci tu con F24.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="decl-panel" id="dp2">
+      <div class="decl-panels-grid">
+        <div class="why-card" style="background:var(--gold-pale);border-color:rgba(201,168,76,.2);">
+          <div class="why-icon gold" style="margin-bottom:16px;">
+            <svg width="20" height="20" viewBox="0 0 22 22" fill="none"><rect x="3" y="7" width="16" height="12" rx="2" stroke="#C9A84C" stroke-width="1.5"/><path d="M7 7V5a4 4 0 0 1 8 0v2" stroke="#C9A84C" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <h3 style="font-size:18px;">Lo chiami una volta</h3>
+          <p style="margin-top:8px;">Se hai altre fonti di reddito, immobili o situazioni complesse. Con il PDF già pronto, l'appuntamento si accorcia — e la parcella pure.</p>
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid rgba(201,168,76,.15);">
+            <span style="font-family:var(--serif);font-size:28px;font-weight:900;color:var(--gold);">200–500€</span>
+            <span style="font-family:var(--sans);font-size:12px;color:var(--muted);margin-left:8px;">ma meno con il PDF pronto</span>
+          </div>
+        </div>
+        <div class="decl-steps-col">
+          <div class="decl-step"><div class="decl-step-n">1</div><div class="decl-step-body"><strong>Mandagli il PDF prima</strong>Il commercialista vede tutto già pronto. Risparmia tempo, tu risparmi sulla parcella.</div></div>
+          <div class="decl-step"><div class="decl-step-n">2</div><div class="decl-step-body"><strong>Un appuntamento breve</strong>Con i dati già calcolati, il tempo si dimezza. Lui si concentra sulla tua situazione specifica.</div></div>
+          <div class="decl-step"><div class="decl-step-n">3</div><div class="decl-step-body"><strong>Tutto il resto lo gestisci tu</strong>Fatture, scadenze, F24 — in autonomia. Il commercialista lo senti solo una volta l'anno.</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
 
 <!-- ── #5/#6: APP SECTION con iPhone mockup CSS ── -->
 <div class="card fu app-section">
@@ -1743,6 +1875,13 @@ a{text-decoration:none;color:inherit;}
   window.addEventListener('scroll',onScroll,{passive:true});
   window.addEventListener('resize',onScroll);
 })();
+
+
+// DICHIARAZIONE TABS
+function declTab(idx){
+  document.querySelectorAll('.decl-tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
+  document.querySelectorAll('.decl-panel').forEach((p,i)=>p.classList.toggle('active',i===idx));
+}
 
 // TICKER
 const t1=[
