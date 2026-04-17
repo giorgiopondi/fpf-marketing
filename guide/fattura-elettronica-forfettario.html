@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google-site-verification" content="6FETwKVx2I5Lsdudc6Y6ZFYzoQg07vXxFUostynhWlw">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;0,9..144,900;1,9..144,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --forest:#1B4332;--fmid:#2D6A4F;--flight:#52B788;--fpale:#D4EDDF;
+  --gold:#C9A84C;--ink:#111210;--muted:#656860;
+  --paper:#F8F6F2;--paper2:#EFECE5;--border:rgba(17,18,16,.08);
+  --serif:'Fraunces',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif;
+  --max-w:720px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;background:var(--paper);}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);-webkit-font-smoothing:antialiased;font-size:16px;line-height:1.7;}
+a{color:var(--forest);text-decoration:none;}
+a:hover{text-decoration:underline;}
+#nav{position:fixed;top:12px;left:0;right:0;z-index:1000;padding:0 16px;}
+.nav-pill{max-width:860px;margin:0 auto;background:rgba(248,246,242,.94);backdrop-filter:blur(18px);border:1px solid var(--border);border-radius:100px;display:flex;align-items:center;justify-content:space-between;padding:10px 12px 10px 20px;box-shadow:0 4px 24px rgba(0,0,0,.07);}
+.nav-logo{display:flex;align-items:center;gap:10px;font-family:var(--sans);font-weight:600;font-size:14px;color:var(--ink);}
+.nav-logo-icon{width:28px;height:28px;flex-shrink:0;}
+.nav-cta{background:var(--forest);color:white;font-size:13px;font-weight:600;padding:9px 20px;border-radius:100px;}
+.hero{padding:120px 24px 64px;max-width:var(--max-w);margin:0 auto;}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--forest);margin-bottom:16px;}
+.hero h1{font-family:var(--serif);font-size:clamp(32px,5vw,52px);font-weight:900;line-height:1.06;letter-spacing:-.022em;color:var(--ink);margin-bottom:20px;}
+.hero-sub{font-size:18px;color:var(--muted);line-height:1.65;max-width:600px;}
+.article{max-width:var(--max-w);margin:0 auto;padding:0 24px 80px;}
+.article h2{font-family:var(--serif);font-size:clamp(22px,3vw,32px);font-weight:900;line-height:1.1;letter-spacing:-.018em;color:var(--ink);margin:48px 0 16px;}
+.article h3{font-family:var(--serif);font-size:20px;font-weight:700;color:var(--ink);margin:32px 0 12px;letter-spacing:-.01em;}
+.article p{margin-bottom:20px;color:var(--ink);line-height:1.75;}
+.article ul,.article ol{margin:0 0 20px 24px;}
+.article li{margin-bottom:8px;line-height:1.65;}
+.article strong{font-weight:600;}
+.note{background:var(--fpale);border-radius:14px;padding:20px 24px;margin:24px 0;font-size:15px;color:var(--forest);}
+.note strong{font-weight:700;}
+.table-wrap{overflow-x:auto;margin:24px 0;}
+table{width:100%;border-collapse:collapse;font-size:14px;}
+th{background:var(--forest);color:white;padding:10px 14px;text-align:left;font-weight:600;font-size:12px;letter-spacing:.04em;text-transform:uppercase;}
+td{padding:10px 14px;border-bottom:1px solid var(--border);}
+tr:nth-child(even) td{background:var(--paper2);}
+.cta-box{background:var(--forest);border-radius:24px;padding:48px 40px;margin:56px 0;text-align:center;}
+.cta-eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--flight);margin-bottom:12px;}
+.cta-title{font-family:var(--serif);font-size:clamp(24px,3.5vw,36px);font-weight:900;color:white;margin-bottom:12px;line-height:1.1;letter-spacing:-.02em;}
+.cta-body{font-size:16px;color:rgba(255,255,255,.6);margin-bottom:28px;line-height:1.6;}
+.cta-btn{display:inline-block;background:white;color:var(--forest);font-family:var(--sans);font-size:15px;font-weight:700;padding:14px 32px;border-radius:100px;}
+footer{background:var(--ink);padding:40px 24px;text-align:center;}
+footer p{font-size:13px;color:rgba(255,255,255,.3);}
+footer a{color:rgba(255,255,255,.5);margin:0 10px;}
+@media(max-width:600px){.hero{padding:100px 20px 40px;}.article{padding:0 20px 60px;}.cta-box{padding:36px 24px;}}
+</style>
+<title>Fattura elettronica per forfettari: come funziona e cosa non sbagliare — Fatture per Forfettari</title>
+<meta name="description" content="Guida completa alla fattura elettronica per il regime forfettario: SdI, bollo virtuale, campi obbligatori e gli errori più comuni da evitare.">
+<meta name="keywords" content="fattura elettronica forfettario, SdI forfettario, bollo virtuale fattura">
+<meta property="og:title" content="Fattura elettronica per forfettari: come funziona e cosa non sbagliare">
+<meta property="og:description" content="Guida completa alla fattura elettronica per il regime forfettario: SdI, bollo virtuale, campi obbligatori e gli errori più comuni da evitare.">
+<meta property="og:url" content="https://www.fattureperforfettari.it/guide/fattura-elettronica-forfettario.html">
+<meta property="og:type" content="article">
+<link rel="canonical" href="https://www.fattureperforfettari.it/guide/fattura-elettronica-forfettario.html">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"Article","headline":"Fattura elettronica per forfettari: come funziona e cosa non sbagliare","description":"Guida completa alla fattura elettronica per il regime forfettario: SdI, bollo virtuale, campi obbligatori e gli errori più comuni da evitare.","publisher":{"@type":"Organization","name":"Fatture per Forfettari","url":"https://www.fattureperforfettari.it"}}
+</script>
+</head>
+<body>
+<nav id="nav">
+  <div class="nav-pill">
+    <a href="/" class="nav-logo">
+      <svg class="nav-logo-icon" width="28" height="28" viewBox="0 0 48 48" fill="none">
+        <rect width="48" height="48" rx="7" fill="#1B4332"/>
+        <rect x="10" y="10" width="7" height="28" fill="#F8F6F2"/>
+        <rect x="10" y="10" width="32" height="6" fill="#F8F6F2"/>
+        <rect x="10" y="22" width="18" height="5" fill="#F8F6F2"/>
+      </svg>
+      Fatture per Forfettari
+    </a>
+    <a href="/#prezzi" class="nav-cta">Accesso anticipato</a>
+  </div>
+</nav>
+<div class="hero">
+  <div class="eyebrow">Fatturazione elettronica</div>
+  <h1>Fattura elettronica per forfettari: come funziona e cosa non devi sbagliare</h1>
+  <p class="hero-sub">Dal 2024 è obbligatoria per tutti. Ecco cosa devi sapere per farla giusta al primo colpo.</p>
+</div>
+<article class="article">
+
+<p>Dal 1° gennaio 2024, tutti i forfettari devono emettere le fatture in formato elettronico attraverso il Sistema di Interscambio (SdI) dell'Agenzia delle Entrate. Non ci sono eccezioni, salvo le prestazioni sanitarie verso persone fisiche.</p>
+<p>La buona notizia: se usi un software dedicato, non devi sapere nulla di XML, codici fiscali o protocolli tecnici. Il software pensa a tutto. Ma è utile capire cosa c'è sotto, così non sbagli i campi e non ricevi fatture respinte.</p>
+
+<h2>Come funziona il Sistema di Interscambio</h2>
+<p>Il flusso è semplice: tu crei la fattura → il software la invia al SdI → il SdI controlla il formato → se è corretta, la recapita al cliente e ti manda una ricevuta. Se c'è un errore, la fattura viene scartata e devi correggerla.</p>
+<p>Le ricevute hanno un significato preciso: <strong>RC (ricevuta di consegna)</strong> significa che il cliente l'ha ricevuta. <strong>NS (notifica di scarto)</strong> significa che c'è un errore da correggere. <strong>MC (mancata consegna)</strong> significa che il cliente non ha un sistema per riceverla — la fattura viene comunque messa a disposizione nell'area riservata dell'Agenzia.</p>
+
+<h2>I campi che devi compilare correttamente</h2>
+<p>Per un forfettario, i campi critici sono questi:</p>
+<div class="table-wrap">
+<table>
+<tr><th>Campo</th><th>Valore corretto</th><th>Perché sbagliarlo costa</th></tr>
+<tr><td>Regime fiscale</td><td>RF19</td><td>Se metti RF01 (ordinario) la fattura è formalmente errata</td></tr>
+<tr><td>Natura IVA</td><td>N2.2</td><td>N2.1 è sbagliata — porta a contestazioni</td></tr>
+<tr><td>Aliquota IVA</td><td>0%</td><td>Non applichi IVA: non inserire importi</td></tr>
+<tr><td>Bollo virtuale</td><td>€ 2,00 se importo &gt; 77,47€</td><td>Omettere il bollo = sanzione</td></tr>
+<tr><td>Ritenuta d'acconto</td><td>Non applicare</td><td>Specificalo nelle note della fattura</td></tr>
+</table>
+</div>
+
+<h2>La dicitura obbligatoria</h2>
+<p>Ogni fattura forfettaria deve riportare questa dicitura, di solito nel campo "causale" o "note":</p>
+<div class="note"><strong>Operazione effettuata ai sensi dell'articolo 1, commi da 54 a 89, della Legge n. 190/2014 e successive modificazioni. Si richiede la non applicazione della ritenuta alla fonte a titolo d'acconto ai sensi dell'articolo 1, comma 67, della Legge n. 190/2014.</strong></div>
+<p>Un buon gestionale la inserisce in automatico. Se usi il portale gratuito dell'Agenzia delle Entrate, devi aggiungerla a mano ogni volta.</p>
+
+<h2>Il bollo virtuale: quando si paga e come</h2>
+<p>Le fatture di importo superiore a 77,47€ richiedono il bollo virtuale da 2€. Non lo paghi ogni volta che emetti una fattura — lo versi trimestralmente in un'unica soluzione tramite F24, usando i codici tributo 2501, 2502, 2503 e 2504 per i quattro trimestri.</p>
+<p>Le scadenze sono: 31 maggio (1° trim.), 30 settembre (2° trim.), 30 novembre (3° trim.), 28 febbraio dell'anno successivo (4° trim.).</p>
+
+<h2>Gli errori più comuni</h2>
+<ul>
+<li><strong>Usare il codice regime RF01 invece di RF19.</strong> È l'errore più frequente per chi viene da altri regimi o usa software non configurati per il forfettario.</li>
+<li><strong>Dimenticare il bollo su fatture sopra 77,47€.</strong> L'Agenzia delle Entrate lo vede e può contestarlo.</li>
+<li><strong>Applicare la ritenuta d'acconto.</strong> Nel regime forfettario non si applica — se il cliente te la trattiene ugualmente, hai diritto al rimborso o alla compensazione.</li>
+<li><strong>Sbagliare il codice destinatario.</strong> Per aziende usa il codice SDI a 7 cifre. Per privati usa "0000000" e la PEC o codice fiscale nel campo apposito.</li>
+</ul>
+
+<h2>Conservazione delle fatture</h2>
+<p>Le fatture elettroniche vanno conservate digitalmente per 10 anni. Il servizio gratuito dell'Agenzia delle Entrate (sezione "Fatture e Corrispettivi") assolve a questo obbligo automaticamente. In alternativa, quasi tutti i software di fatturazione includono la conservazione sostitutiva nel piano.</p>
+
+<div class="cta-box">
+  <div class="cta-eyebrow">Fatture per Forfettari</div>
+  <h3 class="cta-title">Il gestionale costruito solo per te.</h3>
+  <p class="cta-body">Fatture elettroniche, scadenze automatiche, monitor 85k. 29,90€/anno. 30 giorni gratis, nessuna carta.</p>
+  <a href="/" class="cta-btn">Richiedi accesso anticipato →</a>
+</div>
+</article>
+<footer>
+  <p><a href="/">Fatture per Forfettari</a> · <a href="/privacy.html">Privacy</a> · <a href="/termini.html">Termini</a></p>
+  <p style="margin-top:8px;">© 2026 Fatture per Forfettari · fattureperforfettari.it</p>
+</footer>
+</body>
+</html>
